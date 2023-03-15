@@ -1,0 +1,10 @@
+  for (let index = 0; index <= 200; index++) {
+        fs.rename(
+          `./data/hotitems10/hot_items_${index}.json`,
+          `./data/post/hot_items_${index + 1182}.json`,
+          (err) => {
+            if (err) throw err;
+            console.log(`File renamed successfully!`, index);
+          }
+        );
+      }
