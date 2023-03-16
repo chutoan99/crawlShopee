@@ -1,29 +1,21 @@
 const request = require("request");
-const URL = require("../utils/url");
-const msg = require("../utils/msg");
 const fs = require("fs");
 const flash_sale = require("../../data/flashSale/flash_sale.json");
 
 const crawlControllers = {
   CategoryTree: async (req, res) => {
     request(
-      URL.CATEGORY_TREE,
+      `https://shopee.vn/api/v4/pages/get_category_tree`,
       (error, response, body) =>
         new Promise(async (resolve, reject) => {
           try {
-            const response = await body;
-            console.log(body);
-            await fs.writeFile(
-              "../../data/app/category_tree.json",
-              response,
-              (err) => {
-                if (err) {
-                  console.log(msg.error + err);
-                } else {
-                  console.log(msg.success);
-                }
+            fs.writeFile("../../data/app/category_tree.json", body, (err) => {
+              if (err) {
+                console.log("Ghi data vô file json thất bại: " + err);
+              } else {
+                console.log("Thêm data thanh công !");
               }
-            );
+            });
             resolve(response);
           } catch (error) {
             reject(error);
@@ -34,22 +26,17 @@ const crawlControllers = {
 
   HomeCategory: async (req, res) => {
     request(
-      URL.HOME_CATEGORY_LISTS,
-      (error, response, body) =>
+      `https://shopee.vn/api/v4/pages/get_homepage_category_list`,
+      (error, response) =>
         new Promise((resolve, reject) => {
           try {
-            const response = body;
-            fs.writeFile(
-              "../../data/app/home_category.json",
-              response,
-              (err) => {
-                if (err) {
-                  console.log(msg.error + err);
-                } else {
-                  console.log(msg.success);
-                }
+            fs.writeFile("../../data/app/home_category.json", body, (err) => {
+              if (err) {
+                console.log("Ghi data vô file json thất bại: " + err);
+              } else {
+                console.log("Thêm data thanh công !");
               }
-            );
+            });
             resolve(response);
           } catch (error) {
             reject(error);
@@ -61,9 +48,9 @@ const crawlControllers = {
   GetItem: async (req, res) => {
     // list code collection
     // 1237209 ,1918898, 1655298, 1123034, 1178224, 1170158, 2048012,  2040082, 2013496
-    const collection = 1822140;
+    const collectionId = 1822140;
     request(
-      URL.GET_ITEMS(collection),
+      `https://shopee.vn/api/v4/collection/get_items?collection_id=${collectionId}&limit=150&show_collection_info=true&source=1`,
       (error, response, body) =>
         new Promise((resolve, reject) => {
           try {
@@ -73,9 +60,9 @@ const crawlControllers = {
               response,
               (err) => {
                 if (err) {
-                  console.log(msg.error + err);
+                  console.log("Ghi data vô file json thất bại: " + err);
                 } else {
-                  console.log(msg.success);
+                  console.log("Thêm data thanh công !");
                 }
               }
             );
@@ -89,19 +76,18 @@ const crawlControllers = {
 
   FlashSale: async (req, res) => {
     request(
-      URL.FLASH_SALE,
+      `https://shopee.vn/api/v4/flash_sale/flash_sale_get_items?limit=300&need_personalize=true&offset=0&order_mode=1&sort_soldout=true&with_dp_items=true`,
       (error, response, body) =>
         new Promise((resolve, reject) => {
           try {
-            const response = body;
             fs.writeFile(
               "../../data/flashSale/flash_sale.json",
-              response,
+              body,
               (err) => {
                 if (err) {
-                  console.log(msg.error + err);
+                  console.log("Ghi data vô file json thất bại: " + err);
                 } else {
-                  console.log(msg.success);
+                  console.log("Thêm data thanh công !");
                 }
               }
             );
@@ -134,14 +120,14 @@ const crawlControllers = {
           try {
             const limit = 100;
             const shopid = 267466458;
-            await request(
+            request(
               `https://shopee.vn/api/v4/pdp/get_hot_sales?item_id=${id}&limit=${limit}&offset=0&shop_id=${shopid}`,
               (error, response, body) => {
                 fs.writeFile("../data/vien.json", body, (err) => {
                   if (err) {
-                    console.log(msg.error + err);
+                    console.log("Ghi data vô file json thất bại: " + err);
                   } else {
-                    console.log(msg.success);
+                    console.log("Thêm data thanh công !");
                   }
                 });
               }
@@ -164,8 +150,8 @@ const crawlControllers = {
     try {
       for (let index = 0; index < flash_sale?.data?.items.length; index++) {
         const { itemid, shopid } = xx[index];
-        await request(
-          URL.RATING(itemid, shopid),
+        request(
+          `https://shopee.vn/api/v2/item/get_ratings?filter=0&flag=1&itemid=${itemid}&shopid=${shopid}`,
           (error, response, body) =>
             new Promise(async (resolve, reject) => {
               try {
@@ -174,9 +160,9 @@ const crawlControllers = {
                   body,
                   (err) => {
                     if (err) {
-                      console.log(msg.error + err);
+                      console.log("Ghi data vô file json thất bại: " + err);
                     } else {
-                      console.log(msg.success + index);
+                      console.log("Thêm data thanh công !" + index);
                     }
                   }
                 );
@@ -310,20 +296,25 @@ const crawlControllers = {
         161677294, 10362464, 417241850, 133725512, 57599990, 283396972,
         537893863, 39566346, 294030011,
       ];
-      const promises = ShopID.map((id, index) => {
+      const promises = ShopID.map((shopid, index) => {
         return new Promise(async (resolve, reject) => {
           try {
-            const body = await request(URL.SHOP_INFO(id));
-            fs.writeFile(
-              `../../data/shop/shopInfo_${index}.json`,
-              body,
-              (err) => {
-                if (err) {
-                  reject(err);
-                } else {
-                  console.log(`Shop ${index} processed successfully`);
-                  resolve(body);
-                }
+            request(
+              `https://shopee.vn/api/v4/product/get_shop_info?shopid=${shopid}`,
+              (error, response, body) => {
+                fs.writeFile(
+                  `../../data/shop/shopInfo_${index}.json`,
+                  body,
+                  (err) => {
+                    if (err) {
+                      console.log("Ghi data vô file json thất bại: " + err);
+                      reject(err);
+                    } else {
+                      console.log("Thêm data thanh công !");
+                      resolve(body);
+                    }
+                  }
+                );
               }
             );
           } catch (error) {
@@ -347,7 +338,7 @@ const crawlControllers = {
         const userName = require(`../data/shop/shopInfo_${index}.json`).data
           .account.username;
         request(
-          URL.SHOP_DETAIL(userName),
+          `https://shopee.vn/api/v4/shop/get_shop_detail?&username=${userName}&fbclid=IwAR0c-vICsNCDIzP12vPlW3uUEANt-kua6ocxXcnFmdeNODcVDdU36B8uDxc`,
           (error, response, body) =>
             new Promise(async (resolve, reject) => {
               try {
@@ -356,9 +347,9 @@ const crawlControllers = {
                   body,
                   (err) => {
                     if (err) {
-                      console.log(msg.error + err);
+                      console.log("Ghi data vô file json thất bại: " + err);
                     } else {
-                      console.log(msg.success);
+                      console.log("Thêm data thanh công !");
                     }
                   }
                 );
@@ -378,27 +369,17 @@ const crawlControllers = {
     }
   },
 
-  ItemDetail: async (req, res) => {
-    try {
-      const itemId = 21665630844;
-      const shopid = 111461248;
-      await getItemDetail();
-    } catch (error) {
-      console.log(error);
-    }
-  },
-
-  SHOPMALL: async (req, res) => {
+  ShopMall: async (req, res) => {
     request(
-      URL.GET_SHOP_MAll,
+      `https://shopee.vn/api/v4/homepage/mall_shops?limit=100`,
       (error, response, body) =>
         new Promise(async (resolve, reject) => {
           try {
             fs.writeFile(`../data/shopMall.json`, body, (err) => {
               if (err) {
-                console.log(msg.error + err);
+                console.log("Ghi data vô file json thất bại: " + err);
               } else {
-                console.log(msg.success);
+                console.log("Thêm data thanh công !");
               }
             });
           } catch (error) {
@@ -410,15 +391,15 @@ const crawlControllers = {
 
   CATE: async (req, res) => {
     request(
-      URL.GET_CATE(page, limit),
+      `https://banhang.shopee.vn/help/api/v3/global_category/list/?page=${page}&size=${limit}`,
       (error, response, body) =>
         new Promise(async (resolve, reject) => {
           try {
             fs.writeFile(`../data/cate/cate_${index}.json`, body, (err) => {
               if (err) {
-                console.log(msg.error + err);
+                console.log("Ghi data vô file json thất bại: " + err);
               } else {
-                console.log(msg.success) + `cate_${index}.json`;
+                console.log("Thêm data thanh công !");
               }
             });
           } catch (error) {

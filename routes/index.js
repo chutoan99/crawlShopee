@@ -9,13 +9,12 @@ const initRoutes = (app) => {
   router.get("/api/crawl/homeCategory", crawlController.HomeCategory);
   router.get("/api/crawl/flashSale", crawlController.FlashSale);
   router.get("/api/crawl/hotItems", crawlController.HotItems);
-  router.get("/api/crawl/api/crawl/itemDetail", crawlController.ItemDetail);
   router.get("/api/crawl/ratings", crawlController.Ratings);
   router.get("/api/crawl/shopInfo", crawlController.ShopInfo);
   router.get("/shopDetail", crawlController.ShopDetail);
   router.get("/api/crawl/getItem", crawlController.GetItem);
   router.get("/api/crawl/getallcate", crawlController.CATE);
-  router.get("/api/crawl/shopMall", crawlController.SHOPMALL);
+  router.get("/api/crawl/shopMall", crawlController.ShopMall);
   //insert
   router.post("/api/insert/insert", InsertControllers.Insert);
   router.post("/api/insert/app", InsertControllers.App);

@@ -19,8 +19,7 @@ app.use(
   })
 );
 initRoutes(app);
-
-const port = process.env.PORT || 8080;
+const port = 8000;
 
 app.listen(port, () => {
   console.log(`http://localhost:${port}`);

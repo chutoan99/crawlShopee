@@ -8,9 +8,11 @@ const search_suggestion = require("../../data/search_suggestion.json");
 const notify = require("../../data/notify.json");
 const flash_sale = require("../../data/flashSale/flash_sale.json");
 const shopMall = require("../../data/shopMall.json");
-const formatDate = require("../utils/formatDate");
 require("dotenv").config();
-
+const formatDate = (time) => {
+  const date = new Date(time * 1000);
+  return date.toLocaleString();
+};
 const InsertControllers = {
   Industries: async (req, res) => {
     try {
